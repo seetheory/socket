@@ -4,11 +4,12 @@
   "description": "Websocket communication manager",
   "main": "index.js",
   "scripts": {
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "seetheory",
   "license": "ISC",
   "dependencies": {
-    "websocket": "^1.0.31"
+    "ws": "^7.2.1"
   }
 }
