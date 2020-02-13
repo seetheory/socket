@@ -24,6 +24,7 @@ wss.on('connection', (ws) => {
 
 const functionFiles = {
   user: require('./functions/user'),
+  session: require('./functions/session')
 }
 
 /**
@@ -47,7 +48,7 @@ function serializeSend(payload, ws) {
  * example: { func: 'user.create', data: { username: 'seetheory' ... }}
  **/
 async function handleMessage(payload, ws) {
-  const { func, data, _rid } = payload
+  const { func, _rid } = payload
 
   if (!_rid) {
     serializeSend({
@@ -58,9 +59,9 @@ async function handleMessage(payload, ws) {
   const send = (_message, _data, _status) => {
     const message = typeof _message === 'string' ? _message : ''
     let data = {}
-    if (typeof _message === 'object') {
+    if (typeof _message === 'object' || Array.isArray(_message)) {
       data = _message
-    } else if (typeof _data === 'object') {
+    } else if (typeof _data === 'object' || Array.isArray(_message)) {
       data = _data
     }
     let status = 0
@@ -73,7 +74,7 @@ async function handleMessage(payload, ws) {
     }
     serializeSend({
       status,
-      _rid: payload._rid,
+      _rid,
       data,
       message: message || (status === 0 ? 'Success' : 'Failure'),
     }, ws)
@@ -86,18 +87,18 @@ async function handleMessage(payload, ws) {
     if (!fn) {
       serializeSend({
         status: 4,
-        _rid: payload._rid,
+        _rid,
         message: `Could not find function "${func}"`,
       })
       return
     }
-    await fn(data, send)
+    await fn(payload.data, send)
   } catch (err) {
     console.log(`Func ${func} threw an uncaught error`)
     console.log(err)
     serializeSend({
       status: 1,
-      _rid: payload._rid,
+      _rid,
       message: `Func ${func} threw an uncaught error`,
       data: {
         error: err.toString(),
