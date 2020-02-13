@@ -3,6 +3,12 @@ const jwt = require('jsonwebtoken')
 const uuid = require('uuid')
 const { connect, p } = require('./db')
 
+function parseAuth(token) {
+  if (!token) throw new Error('No token in request')
+  const user = jwt.verify(token, process.env.WEB_TOKEN_SECRET)
+  return user
+}
+
 /**
  * data: object
  * send: function(message: string|object, data?: object, status?: number)
@@ -91,5 +97,16 @@ exports.login = async (data, send) => {
     token,
     ...user,
     passwordHash: ''
+  })
+}
+
+exports.load = async (data, send) => {
+  const { id } = parseAuth(data.token)
+  const client = await connect()
+  const user = JSON.parse(await p(client, client.hget)('users', id))
+  client.quit()
+  send({
+    ...user,
+    passwordHash: '',
   })
 }

@@ -81,7 +81,7 @@ async function handleMessage(payload, ws) {
   try {
     // ['user, 'create'] = 'user.create'.split('.')
     const args = func.split('.')
-    // require('user')['create'](data, send)
+    // fn = require('user')['create']
     const fn = functionFiles[args[0]][args[1]]
     if (!fn) {
       serializeSend({
