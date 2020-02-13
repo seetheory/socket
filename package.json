@@ -10,6 +10,9 @@
   "author": "seetheory",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^3.0.8",
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^3.4.0",
     "ws": "^7.2.1"
   }
 }
